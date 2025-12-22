@@ -5,7 +5,7 @@ import PickleballCourt from './components/PickleballCourt';
 import ScoreDisplay from './components/ScoreDisplay';
 import Timer from './components/Timer';
 import SetupModal from './components/SetupModal';
-import { Undo2, HelpCircle, Settings, Trophy, Download, Share2 } from 'lucide-react';
+import { Undo2, HelpCircle, Settings, Trophy, Download, Share2, PlayCircle } from 'lucide-react';
 
 const DEFAULT_SETTINGS: MatchSettings = {
   winAt: 21,
@@ -44,7 +44,8 @@ const App: React.FC = () => {
     history: [],
   });
 
-  const [showSetup, setShowSetup] = useState(true);
+  const [showSetup, setShowSetup] = useState(false);
+  const [matchStarted, setMatchStarted] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [savedTeams, setSavedTeams] = useState<SavedTeam[]>([]);
 
@@ -96,7 +97,6 @@ const App: React.FC = () => {
         console.log('Error sharing:', err);
       }
     } else {
-      // Fallback: Copy to clipboard
       navigator.clipboard.writeText(text);
       alert('Result copied to clipboard!');
     }
@@ -132,6 +132,10 @@ const App: React.FC = () => {
   };
 
   const addPoint = (teamType: TeamType) => {
+    if (!matchStarted) {
+      setShowSetup(true);
+      return;
+    }
     if (gameState.isGameOver || gameState.isMatchOver) return;
     saveHistory();
 
@@ -171,6 +175,7 @@ const App: React.FC = () => {
   };
 
   const swapPlayers = (teamType: TeamType) => {
+    if (!matchStarted) return;
     saveHistory();
     setGameState(prev => {
       const newState = { ...prev };
@@ -182,6 +187,7 @@ const App: React.FC = () => {
   };
 
   const toggleServingTeam = () => {
+    if (!matchStarted) return;
     saveHistory();
     setGameState(prev => ({
       ...prev,
@@ -213,8 +219,8 @@ const App: React.FC = () => {
             />
             
             <div className="grid grid-cols-2 gap-2">
-              <button onClick={undo} disabled={gameState.history.length === 0} className="py-3 bg-slate-800 rounded-xl font-bold disabled:opacity-50 border border-slate-700 active:scale-95 transition-transform flex items-center justify-center gap-2"><Undo2 size={18}/> Undo</button>
-              <button onClick={toggleServingTeam} className="py-3 bg-indigo-600 rounded-xl font-bold active:scale-95 transition-transform">Flip Serve</button>
+              <button onClick={undo} disabled={!matchStarted || gameState.history.length === 0} className="py-3 bg-slate-800 rounded-xl font-bold disabled:opacity-30 border border-slate-700 active:scale-95 transition-transform flex items-center justify-center gap-2"><Undo2 size={18}/> Undo</button>
+              <button onClick={toggleServingTeam} disabled={!matchStarted} className="py-3 bg-indigo-600 rounded-xl font-bold active:scale-95 transition-transform disabled:opacity-30">Flip Serve</button>
             </div>
 
             <Timer />
@@ -257,11 +263,29 @@ const App: React.FC = () => {
             )}
           </div>
 
-          <div className="flex-1 w-full min-h-[400px] flex items-center justify-center bg-slate-900/50 rounded-3xl p-4 border border-slate-800 overflow-hidden">
+          <div className="flex-1 w-full min-h-[400px] flex items-center justify-center bg-slate-900/50 rounded-3xl p-4 border border-slate-800 overflow-hidden relative">
             <PickleballCourt 
               gameState={gameState} 
               onSwapPlayers={swapPlayers}
             />
+            
+            {!matchStarted && (
+              <div className="absolute inset-0 z-20 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6">
+                <div className="text-center space-y-6 max-w-sm">
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-black text-white">Welcome, Referee!</h2>
+                    <p className="text-slate-400 text-sm">Configure your match settings to begin tracking scores and player positions.</p>
+                  </div>
+                  <button 
+                    onClick={() => setShowSetup(true)}
+                    className="group bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-8 py-4 rounded-2xl font-black text-lg uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
+                  >
+                    <PlayCircle size={28} className="group-hover:rotate-12 transition-transform" />
+                    Start New Match
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
@@ -288,6 +312,7 @@ const App: React.FC = () => {
               isMatchOver: false,
               history: [],
             });
+            setMatchStarted(true);
             setShowSetup(false);
           }}
         />
