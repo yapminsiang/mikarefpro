@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { TeamType, Side, GameState, Team, Player, MatchSettings, SavedTeam } from './types';
-import PickleballCourt from './components/PickleballCourt';
-import ScoreDisplay from './components/ScoreDisplay';
-import Timer from './components/Timer';
-import SetupModal from './components/SetupModal';
+import { TeamType, Side, GameState, Team, Player, MatchSettings, SavedTeam } from './types.ts';
+import PickleballCourt from './components/PickleballCourt.tsx';
+import ScoreDisplay from './components/ScoreDisplay.tsx';
+import Timer from './components/Timer.tsx';
+import SetupModal from './components/SetupModal.tsx';
 import { Undo2, HelpCircle, Settings, Trophy, Download, Share2, PlayCircle } from 'lucide-react';
 
 const DEFAULT_SETTINGS: MatchSettings = {
