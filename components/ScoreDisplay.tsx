@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Team, TeamType } from '../types';
+import { Team, TeamType } from '../types.ts';
 
 interface Props {
   teamA: Team;

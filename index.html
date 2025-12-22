@@ -21,14 +21,12 @@
             overscroll-behavior-y: contain;
             background-color: #0f172a;
             color: white;
-            /* Support for safe areas on iPhones with notches */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
         .court-gradient {
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
         }
-        /* Custom scrollbar for database list */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
@@ -36,16 +34,23 @@
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
+    "react-dom": "https://esm.sh/react-dom@^19.2.3",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
 </head>
 <body>
+    <noscript>
+        <div style="padding: 20px; text-align: center; color: white;">
+            <h1>JavaScript Required</h1>
+            <p>Please enable JavaScript to use the Pickleball Ref Pro app.</p>
+        </div>
+    </noscript>
     <div id="root"></div>
     <!-- Entry point for the React application -->
     <script type="module" src="index.tsx"></script>

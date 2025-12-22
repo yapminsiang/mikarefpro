@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GameState, TeamType } from '../types';
+import { GameState, TeamType } from '../types.ts';
 
 interface Props {
   gameState: GameState;
@@ -52,7 +52,7 @@ const PickleballCourt: React.FC<Props> = ({ gameState, onSwapPlayers }) => {
       {/* Net Line */}
       <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-white/40 z-10"></div>
 
-      {/* Service Lines (Horizontal court has center lines on the left and right halves) */}
+      {/* Service Lines */}
       <div className="absolute left-0 right-[65%] top-1/2 h-0.5 bg-white"></div>
       <div className="absolute left-[65%] right-0 top-1/2 h-0.5 bg-white"></div>
 

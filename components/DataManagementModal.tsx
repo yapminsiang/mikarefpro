@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { SavedTeam } from '../types';
+import { SavedTeam } from '../types.ts';
 import { Trash2, Plus, Download, X, AlertCircle } from 'lucide-react';
 
 interface Props {
@@ -117,12 +117,6 @@ const DataManagementModal: React.FC<Props> = ({ savedTeams, onUpdate, onClose })
           Close
         </button>
       </div>
-      
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-      `}</style>
     </div>
   );
 };
