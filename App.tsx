@@ -5,7 +5,7 @@ import PickleballCourt from './components/PickleballCourt';
 import ScoreDisplay from './components/ScoreDisplay';
 import Timer from './components/Timer';
 import SetupModal from './components/SetupModal';
-import { Undo2, HelpCircle, Settings, Trophy } from 'lucide-react';
+import { Undo2, HelpCircle, Settings, Trophy, Download, Share2 } from 'lucide-react';
 
 const DEFAULT_SETTINGS: MatchSettings = {
   winAt: 21,
@@ -48,7 +48,6 @@ const App: React.FC = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [savedTeams, setSavedTeams] = useState<SavedTeam[]>([]);
 
-  // Load saved teams on mount
   useEffect(() => {
     const data = localStorage.getItem('pb_ref_teams');
     if (data) {
@@ -82,6 +81,45 @@ const App: React.FC = () => {
     }
   };
 
+  const shareMatchResult = async () => {
+    const { teamA, teamB } = gameState;
+    const winner = teamA.gamesWon > teamB.gamesWon ? teamA.name : teamB.name;
+    const text = `🏓 Pickleball Match Result\n\n🏆 Winner: ${winner}\n\n${teamA.name}: ${teamA.score} (${teamA.gamesWon} Games)\n${teamB.name}: ${teamB.score} (${teamB.gamesWon} Games)\n\nSent from Ref Pro.`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Match Result',
+          text: text,
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(text);
+      alert('Result copied to clipboard!');
+    }
+  };
+
+  const exportToCSV = () => {
+    const { teamA, teamB, settings } = gameState;
+    const date = new Date().toLocaleString();
+    const headers = ["Match Date", "Team A Name", "Team B Name", "Team A Score", "Team B Score", "Team A Games Won", "Team B Games Won", "Win At", "Best Of", "Win By Two"];
+    const values = [`"${date}"`, `"${teamA.name}"`, `"${teamB.name}"`, teamA.score, teamB.score, teamA.gamesWon, teamB.gamesWon, settings.winAt, settings.bestOf, settings.winByTwo ? "Yes" : "No"];
+    const csvContent = [headers.join(","), values.join(",")].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const filename = `pickleball_${teamA.name.replace(/\s+/g, '_')}_vs_${teamB.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const checkWin = (scoreA: number, scoreB: number, settings: MatchSettings) => {
     if (settings.winByTwo) {
       if (scoreA >= settings.winAt && scoreA - scoreB >= 2) return TeamType.A;
@@ -100,31 +138,24 @@ const App: React.FC = () => {
     setGameState(prev => {
       const newState = { ...prev };
       const scoringTeam = teamType === TeamType.A ? newState.teamA : newState.teamB;
-      
       scoringTeam.score += 1;
-
       if (prev.servingTeam === teamType) {
         const [p1, p2] = scoringTeam.players;
         scoringTeam.players = [p2, p1];
       }
-
       if (prev.servingTeam !== teamType) {
         newState.servingTeam = teamType;
       }
-
       const winner = checkWin(newState.teamA.score, newState.teamB.score, newState.settings);
       if (winner) {
         if (winner === TeamType.A) newState.teamA.gamesWon += 1;
         else newState.teamB.gamesWon += 1;
-        
         newState.isGameOver = true;
-        
         const neededToWin = Math.ceil(newState.settings.bestOf / 2);
         if (newState.teamA.gamesWon >= neededToWin || newState.teamB.gamesWon >= neededToWin) {
           newState.isMatchOver = true;
         }
       }
-
       return newState;
     });
   };
@@ -172,7 +203,6 @@ const App: React.FC = () => {
 
       <main className="flex-1 w-full flex flex-col gap-4">
         <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* Controls Sidebar */}
           <div className="w-full lg:w-80 space-y-4">
             <ScoreDisplay 
               teamA={gameState.teamA} 
@@ -194,16 +224,39 @@ const App: React.FC = () => {
             )}
             
             {gameState.isMatchOver && (
-              <div className="p-4 bg-emerald-900/40 border border-emerald-500 rounded-xl text-center">
-                <Trophy className="mx-auto mb-2 text-yellow-400" size={32} />
-                <p className="font-black text-xl text-emerald-400">MATCH OVER!</p>
-                <p className="text-sm text-white">{gameState.teamA.gamesWon > gameState.teamB.gamesWon ? gameState.teamA.name : gameState.teamB.name} Wins</p>
-                <button onClick={() => setShowSetup(true)} className="mt-4 px-6 py-2 bg-emerald-600 rounded-lg text-sm font-bold">New Match</button>
+              <div className="p-4 bg-emerald-900/40 border border-emerald-500 rounded-xl text-center space-y-3">
+                <Trophy className="mx-auto text-yellow-400" size={32} />
+                <div>
+                  <p className="font-black text-xl text-emerald-400">MATCH OVER!</p>
+                  <p className="text-sm text-white">{gameState.teamA.gamesWon > gameState.teamB.gamesWon ? gameState.teamA.name : gameState.teamB.name} Wins</p>
+                </div>
+                
+                <div className="pt-2 flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button 
+                      onClick={shareMatchResult} 
+                      className="py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Share2 size={12} /> Share Result
+                    </button>
+                    <button 
+                      onClick={exportToCSV} 
+                      className="py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Download size={12} /> CSV Report
+                    </button>
+                  </div>
+                  <button 
+                    onClick={() => setShowSetup(true)} 
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-colors"
+                  >
+                    New Match
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Court Display */}
           <div className="flex-1 w-full min-h-[400px] flex items-center justify-center bg-slate-900/50 rounded-3xl p-4 border border-slate-800 overflow-hidden">
             <PickleballCourt 
               gameState={gameState} 
