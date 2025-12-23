@@ -13,7 +13,7 @@ const LandingPage: React.FC<Props> = ({ onLaunch }) => {
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full"></div>
       
-      {/* Animated Grid Pattern Overlay */}
+      {/* Static Grid Pattern Overlay */}
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
 
       <div className="relative z-10 flex flex-col items-center max-w-2xl">
@@ -26,9 +26,9 @@ const LandingPage: React.FC<Props> = ({ onLaunch }) => {
           <p className="text-emerald-400 font-bold tracking-[0.3em] uppercase text-sm">
             Welcome to the
           </p>
-          <h1 className="text-5xl md:text-7xl font-black text-white italic tracking-tighter leading-tight">
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
             Pickleball Referee <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">Pro</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">PRO</span>
           </h1>
           <p className="pt-4 text-slate-500 font-medium tracking-widest text-xs uppercase">
             Created by <span className="text-slate-300 font-bold">Mika</span>
