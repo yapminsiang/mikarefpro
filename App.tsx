@@ -5,6 +5,7 @@ import PickleballCourt from './components/PickleballCourt.tsx';
 import ScoreDisplay from './components/ScoreDisplay.tsx';
 import Timer from './components/Timer.tsx';
 import SetupModal from './components/SetupModal.tsx';
+import LandingPage from './components/LandingPage.tsx';
 import { Undo2, HelpCircle, Settings, Trophy, Download, Share2, PlayCircle } from 'lucide-react';
 
 const DEFAULT_SETTINGS: MatchSettings = {
@@ -34,6 +35,7 @@ const INITIAL_TEAM_B: Team = {
 };
 
 const App: React.FC = () => {
+  const [showLanding, setShowLanding] = useState(true);
   const [gameState, setGameState] = useState<GameState>({
     teamA: { ...INITIAL_TEAM_A },
     teamB: { ...INITIAL_TEAM_B },
@@ -194,6 +196,10 @@ const App: React.FC = () => {
       servingTeam: prev.servingTeam === TeamType.A ? TeamType.B : TeamType.A
     }));
   };
+
+  if (showLanding) {
+    return <LandingPage onLaunch={() => setShowLanding(false)} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center p-4 max-w-6xl mx-auto overflow-x-hidden">
